@@ -1,11 +1,26 @@
 import React from 'react';
-import { Hello } from './Hello';
-import { Info } from './Info';
+import { Meteor } from 'meteor/meteor';
+import { useTracker } from "meteor/react-meteor-data";
+import { MainPage } from "./pages/MainPage";
+import { LoginPage } from "./pages/LoginPage";
 
-export const App = () => (
-  <div>
-    <h1>Welcome to Meteor!</h1>
-    <Hello />
-    <Info />
-  </div>
+export const App = () => {
+  const user = useTracker(() => Meteor.user());
+
+  // const logout = () => Meteor.logout();
+
+  if (!user) {
+    return (
+      <LoginPage />
+    );
+  }
+
+
+  // return <div>
+  //   <h1>Welcome to App!</h1>
+  // </div>;
+  return <MainPage />;
+
+}
+
 );
