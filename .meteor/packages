@@ -22,3 +22,4 @@ react-meteor-data       # React higher-order component for reactively tracking M
 zodern:types            # Pull in type declarations from other Meteor packages
 accounts-password
 dev-error-overlay
+standard-minifier-css
