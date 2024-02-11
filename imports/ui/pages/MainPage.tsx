@@ -1,17 +1,15 @@
 import React from "react";
 import { Meteor } from "meteor/meteor";
+import { useSearchParams } from "react-router-dom";
 import { AppointmentsCollection } from "/imports/db/AppointmentsCollection";
 import { Appointment } from "/imports/api/appointments/appointment.model";
 import { useTracker } from "meteor/react-meteor-data";
-import { Card } from "../components/Card";
-
-const DisplayDate = ({ date }: { date: Date }) => {
-  return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
-};
+import { WidgetB } from "../components/WidgetB";
+import { AppointmentList } from "../components/AppointmentList";
 
 export const MainPage = () => {
-  // not sure this is necessary we should never get here if the user is not logged in
-  const user = useTracker(() => Meteor.user());
+  const [searchParams] = useSearchParams();
+  const selected = searchParams.get("selected");
 
   const { appointments, isLoading } = useTracker(() => {
     const handler = Meteor.subscribe("appointments");
@@ -27,41 +25,27 @@ export const MainPage = () => {
 
     return { appointments };
   }) as {
-    appointments: Array<Appointment & { _id: string }>;
+    appointments: Array<Appointment>;
     isLoading: boolean;
   };
+
+  const selectedAppointment =
+    selected &&
+    appointments.find((appointment) => appointment._id === selected);
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
+  console.log("selected", selectedAppointment);
+
   return (
-    <div className="flex">
-      <Card>
-        <h1 className="text-red-600">Welcome to MainPage!</h1>
-
-        <div>
-          {appointments.map((appointment) => (
-            <div key={appointment._id} className="p-4">
-              <h2>
-                {appointment.firstName} {appointment.lastName}
-              </h2>
-
-              <p>
-                <DisplayDate date={appointment.date} />
-              </p>
-
-              <p>{appointment.allDay ? "All day" : "Not all day"}</p>
-
-              <p>
-                {appointment.userId === user?._id
-                  ? "Your appointment"
-                  : "FAILLLL"}
-              </p>
-            </div>
-          ))}
-        </div>
-      </Card>
+    <div className="flex p-4 gap-4">
+      <AppointmentList appointments={appointments} />
+      <WidgetB
+        className="grow"
+        appointment={selectedAppointment ? selectedAppointment : undefined}
+      />
     </div>
   );
 };
