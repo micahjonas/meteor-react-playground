@@ -3,6 +3,7 @@ import { Meteor } from "meteor/meteor";
 import { useSearchParams } from "react-router-dom";
 import { AppointmentsCollection } from "/imports/db/AppointmentsCollection";
 import { Appointment } from "/imports/api/appointments/appointment.model";
+// @ts-ignore
 import { useTracker } from "meteor/react-meteor-data";
 import { WidgetB } from "../components/WidgetB";
 import { AppointmentList } from "../components/AppointmentList";

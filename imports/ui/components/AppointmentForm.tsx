@@ -19,6 +19,8 @@ import { z } from "zod";
 import { cn } from "./utils";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "./Calendar";
+import { Meteor } from "meteor/meteor";
+import { useSearchParams } from "react-router-dom";
 
 const appointmentSchema = z.object({
   firstName: z
@@ -38,6 +40,7 @@ export const AppointmentForm = ({
 }: {
   appointment?: Appointment;
 }) => {
+  const [_, setSearchParams] = useSearchParams();
   const defaultValues = {
     firstName: appointment?.firstName ?? "",
     lastName: appointment?.lastName ?? "",
@@ -45,15 +48,21 @@ export const AppointmentForm = ({
     allDay: appointment?.allDay ?? false,
   };
 
-  console.log("form", defaultValues);
-
   const form = useForm({
     resolver: zodResolver(appointmentSchema),
     defaultValues,
   });
 
   const onSubmit: SubmitHandler<AppointmentFormData> = (data) => {
-    console.log(data);
+    if (appointment) {
+      Meteor.call("appointments.update", appointment._id, data);
+      return;
+    } else {
+      Meteor.call("appointments.insert", data);
+      if (!appointment) {
+        form.reset();
+      }
+    }
   };
 
   return (
@@ -147,7 +156,19 @@ export const AppointmentForm = ({
             )}
           />
         </div>
-        <Button type="submit">{appointment ? "Create" : "Edit"}</Button>
+        <div className="flex gap-4">
+          <Button type="submit" disabled={!form.formState.isDirty}>
+            Save
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setSearchParams({ selected: "" });
+            }}
+          >
+            Cancel
+          </Button>
+        </div>
       </form>
     </Form>
   );

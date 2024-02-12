@@ -1,7 +1,8 @@
 import React from "react";
 import { Accounts } from "meteor/accounts-base";
+// @ts-ignore
 import { useTracker } from "meteor/react-meteor-data";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { MainPage } from "./pages/MainPage";
 import { LoginPage } from "./pages/LoginPage";
 import { Layout } from "./pages/Layout";

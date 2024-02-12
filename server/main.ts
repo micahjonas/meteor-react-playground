@@ -6,6 +6,7 @@ import {
 } from "/imports/api/appointments/appointmentSeeder";
 import { Accounts } from "meteor/accounts-base";
 import "/imports/api/appointments/appointmentPublications";
+import "/imports/api/appointments/appointmentMethods";
 
 const testUsers = [
   { username: "test1", password: "password" },

@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Navigate } from "react-router-dom";
+// @ts-ignore
 import { useTracker } from "meteor/react-meteor-data";
 import loginSchema, { LoginFormData } from "./loginSchema";
 import { Button } from "../Button";

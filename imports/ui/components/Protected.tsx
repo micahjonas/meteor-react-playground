@@ -1,5 +1,6 @@
 import React from "react";
 import { Meteor } from "meteor/meteor";
+// @ts-ignore
 import { useTracker } from "meteor/react-meteor-data";
 import { useLocation, Navigate } from "react-router-dom";
 

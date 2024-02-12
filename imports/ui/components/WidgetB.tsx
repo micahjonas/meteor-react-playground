@@ -8,7 +8,6 @@ interface WidgetBProps extends ComponentPropsWithoutRef<typeof Card> {
 }
 
 export const WidgetB: FC<WidgetBProps> = ({ appointment, ...restProps }) => {
-  console.log("WidgetB", appointment);
   return (
     <Card {...restProps}>
       <CardHeader>
