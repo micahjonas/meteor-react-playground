@@ -20,7 +20,11 @@ import { cn } from "./utils";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "./Calendar";
 import { Meteor } from "meteor/meteor";
+import { startOfDay, endOfDay } from "date-fns";
 import { useSearchParams } from "react-router-dom";
+// @ts-ignore
+import { useSubscribe } from "meteor/react-meteor-data";
+import { AppointmentsCollection } from "/imports/db/AppointmentsCollection";
 
 const appointmentSchema = z.object({
   firstName: z
@@ -33,6 +37,15 @@ const appointmentSchema = z.object({
   allDay: z.boolean().optional(),
 });
 
+interface AllDayValidationQueryClient {
+  date: {
+    $gte: Date;
+    $lte: Date;
+  };
+  allDay?: boolean;
+  _id?: { $ne: string };
+}
+
 export type AppointmentFormData = z.infer<typeof appointmentSchema>;
 
 export const AppointmentForm = ({
@@ -41,6 +54,12 @@ export const AppointmentForm = ({
   appointment?: Appointment;
 }) => {
   const [_, setSearchParams] = useSearchParams();
+
+  // technically we already have a subscription in a parent component
+  // but in case this component is used in isolation we need to subscribe
+  // to the appointments publication
+  const loading = useSubscribe("appointments");
+
   const defaultValues = {
     firstName: appointment?.firstName ?? "",
     lastName: appointment?.lastName ?? "",
@@ -53,17 +72,52 @@ export const AppointmentForm = ({
     defaultValues,
   });
 
-  const onSubmit: SubmitHandler<AppointmentFormData> = (data) => {
+  const onSubmit: SubmitHandler<AppointmentFormData> = async (formData) => {
+    // duplicated code between client and server
+    // is there a better way to handle this?
+    const allDayValidationQuery: AllDayValidationQueryClient = {
+      date: {
+        $gte: startOfDay(formData.date),
+        $lte: endOfDay(formData.date),
+      },
+    };
+    if (appointment?._id) {
+      allDayValidationQuery._id = { $ne: appointment?._id };
+    }
+    if (!formData.allDay) {
+      allDayValidationQuery.allDay = true;
+    }
+
+    const allDayBlockers = await AppointmentsCollection.find(
+      allDayValidationQuery
+    ).fetchAsync();
+    if (allDayBlockers.length > 0) {
+      if (formData.allDay) {
+        form.setError("allDay", {
+          message: "Already booked other appointments on this date",
+        });
+      } else {
+        form.setError("date", {
+          message: "This date is already fully booked",
+        });
+      }
+      return;
+    }
+
     if (appointment) {
-      Meteor.call("appointments.update", appointment._id, data);
+      Meteor.call("appointments.update", appointment._id, formData);
       return;
     } else {
-      Meteor.call("appointments.insert", data);
+      Meteor.call("appointments.insert", formData);
       if (!appointment) {
         form.reset();
       }
     }
   };
+
+  if (loading()) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Form {...form}>

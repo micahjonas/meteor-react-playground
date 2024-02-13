@@ -1,6 +1,7 @@
 import React from "react";
 import { Meteor } from "meteor/meteor";
 import { useSearchParams } from "react-router-dom";
+import { startOfDay } from "date-fns";
 import { AppointmentsCollection } from "/imports/db/AppointmentsCollection";
 import { Appointment } from "/imports/api/appointments/appointment.model";
 // @ts-ignore
@@ -20,7 +21,7 @@ export const MainPage = () => {
     }
 
     const appointments = AppointmentsCollection.find(
-      {},
+      { date: { $gte: startOfDay(new Date()) },
       { sort: { date: 1 } }
     ).fetch();
 
@@ -37,8 +38,6 @@ export const MainPage = () => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
-  console.log("selected", selectedAppointment);
 
   return (
     <div className="flex p-4 gap-4">
