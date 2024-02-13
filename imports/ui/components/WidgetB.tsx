@@ -1,22 +1,23 @@
-import React, { ComponentPropsWithoutRef, FC } from "react";
+import React from "react";
 import { Appointment } from "/imports/api/appointments/appointment.model";
+import { AppointmentItem } from "./AppointmentItem";
 import { Card, CardContent, CardHeader, CardTitle } from "./Card";
-import { AppointmentForm } from "./AppointmentForm";
+import { SearchInput } from "./SearchInput";
 
-interface WidgetBProps extends ComponentPropsWithoutRef<typeof Card> {
-  appointment?: Appointment;
-}
-
-export const WidgetB: FC<WidgetBProps> = ({ appointment, ...restProps }) => {
+export const WidgetB = ({ appointments }: { appointments: Appointment[] }) => {
   return (
-    <Card {...restProps}>
+    <Card className="max-h-full flex flex-col">
       <CardHeader>
-        <CardTitle>
-          {appointment ? "Edit appointment" : "Create appointment"}
-        </CardTitle>
+        <CardTitle>Appointments</CardTitle>
       </CardHeader>
-      <CardContent>
-        <AppointmentForm appointment={appointment} key={appointment?._id} />
+      <CardContent className="space-y-4 overflow-hidden grow shrink flex flex-col">
+        <SearchInput />
+
+        <div className="flex flex-col gap-2 overflow-auto">
+          {appointments.map((appointment) => (
+            <AppointmentItem key={appointment._id} appointment={appointment} />
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

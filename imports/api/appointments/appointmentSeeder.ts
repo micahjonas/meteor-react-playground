@@ -1,7 +1,7 @@
 import { fakerDE as faker } from "@faker-js/faker";
 import { Meteor } from "meteor/meteor";
 import { addMonths } from "date-fns";
-import { AppointmentForCreate } from "./appointment.model";
+import { AppointmentForSeed } from "./appointment.model";
 import { AppointmentsCollection } from "/imports/db/AppointmentsCollection";
 
 function generateRandomDate(): Date {
@@ -37,7 +37,7 @@ function generateUniqueRandomDate(numberOfDates: number): Date[] {
 export function generateSeedAppointments(user: Meteor.User) {
   // reserve 5 days for all-day appointments
   const allDayAppointments = generateUniqueRandomDate(5);
-  const appointments: AppointmentForCreate[] = [];
+  const appointments: AppointmentForSeed[] = [];
 
   while (appointments.length < 15) {
     const date = generateRandomDate();
@@ -72,7 +72,7 @@ export function generateSeedAppointments(user: Meteor.User) {
 }
 
 export async function insertAppointment(
-  appointment: AppointmentForCreate
+  appointment: AppointmentForSeed
 ): Promise<string> {
   return AppointmentsCollection.insertAsync(appointment);
 }

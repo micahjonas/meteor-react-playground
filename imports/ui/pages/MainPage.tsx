@@ -6,12 +6,13 @@ import { AppointmentsCollection } from "/imports/db/AppointmentsCollection";
 import { Appointment } from "/imports/api/appointments/appointment.model";
 // @ts-ignore
 import { useTracker } from "meteor/react-meteor-data";
+import { WidgetA } from "../components/WidgetA";
 import { WidgetB } from "../components/WidgetB";
-import { AppointmentList } from "../components/AppointmentList";
 
 export const MainPage = () => {
   const [searchParams] = useSearchParams();
   const selected = searchParams.get("selected");
+  const search = searchParams.get("search");
 
   const { appointments, isLoading } = useTracker(() => {
     const handler = Meteor.subscribe("appointments");
@@ -20,10 +21,19 @@ export const MainPage = () => {
       return { appointments: [], isLoading: true };
     }
 
-    const appointments = AppointmentsCollection.find(
-      { date: { $gte: startOfDay(new Date()) },
-      { sort: { date: 1 } }
-    ).fetch();
+    const hidePastAppointments = { date: { $gte: startOfDay(new Date()) } };
+    const filter = {
+      $or: [
+        { firstName: { $regex: `^${search}`, $options: "i" } },
+        { lastName: { $regex: `^${search}`, $options: "i" } },
+      ],
+    };
+    const query = search
+      ? { ...hidePastAppointments, ...filter }
+      : hidePastAppointments;
+    const appointments = AppointmentsCollection.find(query, {
+      sort: { date: 1 },
+    }).fetch();
 
     return { appointments };
   }) as {
@@ -40,12 +50,12 @@ export const MainPage = () => {
   }
 
   return (
-    <div className="flex p-4 gap-4">
-      <AppointmentList appointments={appointments} />
-      <WidgetB
+    <div className="flex p-4 gap-4 overflow-hidden">
+      <WidgetA
         className="grow"
         appointment={selectedAppointment ? selectedAppointment : undefined}
       />
+      <WidgetB appointments={appointments} />
     </div>
   );
 };
