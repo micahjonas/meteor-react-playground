@@ -19,6 +19,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",
+    "expect": "^29.7.0",
     "lucide-react": "^0.323.0",
     "meteor-node-stubs": "^1.2.7",
     "postcss": "^8.4.35",
@@ -44,7 +45,6 @@
     "mainModule": {
       "client": "client/main.tsx",
       "server": "server/main.ts"
-    },
-    "testModule": "tests/main.ts"
+    }
   }
 }
